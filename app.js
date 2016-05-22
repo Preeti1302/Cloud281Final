@@ -1,7 +1,4 @@
-
-/**
-
-Mighty Gumball, Inc.
+/**Mighty Gumball, Inc.
 Version 2.0
 
 - Rudimentary Page Templates using RegEx
@@ -165,14 +162,53 @@ var handle_get = function (req, res) {
     console.log( ts )
     state = "no-coin" ;
 
-    page( req, res, state, ts ) ;
+   // page( req, res, state, ts ) ;
 }
 
+var user = {
+   "user4" : {
+      "name" : "mohit",
+      "password" : "password4",
+      "profession" : "teacher",
+      "id": 4
+   }
+}
+
+
+var gett = function (req, res){
+
+
+var fs = require("fs");
+var assert = require('assert');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://52.32.210.48:27017,52.39.136.0:27017,52.39.27.47:27017/test?w=0&readPreference=secondary";
+
+
+
+    MongoClient.connect(url, function(err, db) {
+        var cursor =db.collection('mycol').find();
+        var doc_total = {};
+        var index = 0;
+        cursor.each(function(err, doc) {
+          console.log("Doc is "+JSON.stringify(doc))
+          if (doc != null) {
+             doc_total[index++] = doc;
+          } else {
+              db.close();
+              res.end(JSON.stringify((doc_total),null,4));
+          }
+       });
+    });
+}       
+
+
+//app.set('port',5000);
 app.set('port', (process.env.PORT || 5000));
 
 app.post("*", handle_post );
-app.get( "*", handle_get ) ;
+//app.get( "*", handle_get ) ;
+app.get("/test",gett)
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
-});
+})
