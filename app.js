@@ -78,7 +78,59 @@ var getfromDB = function (req, res){
 var fs = require("fs");
 var assert = require('assert');
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://52.32.210.48:27017,52.39.136.0:27017,52.39.27.47:27017/test?w=0&readPreference=secondary";
+var url = "mongodb://52.32.210.48:27017/test?w=0&readPreference=secondary";
+
+
+
+    MongoClient.connect(url, function(err, db) {
+        var cursor =db.collection('hello').find();
+        var doc_total = {};
+        var index = 0;
+        cursor.each(function(err, doc) {
+          console.log("Doc is "+JSON.stringify(doc))
+          if (doc != null) {
+             doc_total[index++] = doc;
+          } else {
+              db.close();
+              res.end(JSON.stringify((doc_total),null,4));
+          }
+       });
+    });
+}       
+
+var getfromDBslave1 = function (req, res){
+
+
+var fs = require("fs");
+var assert = require('assert');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://52.39.136.0:27017/test?w=0&readPreference=secondary";
+
+
+
+    MongoClient.connect(url, function(err, db) {
+        var cursor =db.collection('hello').find();
+        var doc_total = {};
+        var index = 0;
+        cursor.each(function(err, doc) {
+          console.log("Doc is "+JSON.stringify(doc))
+          if (doc != null) {
+             doc_total[index++] = doc;
+          } else {
+              db.close();
+              res.end(JSON.stringify((doc_total),null,4));
+          }
+       });
+    });
+}       
+
+var getfromDBslave2 = function (req, res){
+
+
+var fs = require("fs");
+var assert = require('assert');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://52.39.27.47:27017/test?w=0&readPreference=secondary";
 
 
 
@@ -102,8 +154,10 @@ var url = "mongodb://52.32.210.48:27017,52.39.136.0:27017,52.39.27.47:27017/test
 //app.set('port',5000);
 app.set('port', (process.env.PORT || 5000));
 
-//app.post("/write",writeToDB);
-app.get("/",getfromDB );
+//app.post("/wrimongoFinal_1",writeToDB);
+app.get("/MongoFinal_1",getfromDB );
+app.get("/MongoFinal_2",getfromDBslave1);
+app.get("/MongoFinal_3",getfromDBslave2);
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
